@@ -23,6 +23,12 @@ export default async function MyPage() {
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("username, email, avatar_url, bio, created_at")
+    .eq("id", user.id)
+    .maybeSingle();  
+
   const { count: followingCount } = await supabase
     .from("subscriptions")
     .select("*", { count: "exact", head: true })
@@ -56,11 +62,14 @@ export default async function MyPage() {
   const totalLikes =
     videos?.reduce((sum, video) => sum + (video.likes ?? 0), 0) ?? 0;
 
-  const joinedDate = user.created_at
-    ? new Date(user.created_at).toLocaleDateString("ko-KR")
-    : "-";
+    const joinedDate = profile?.created_at
+    ? new Date(profile.created_at).toLocaleDateString("ko-KR")
+    : user.created_at
+      ? new Date(user.created_at).toLocaleDateString("ko-KR")
+      : "-";
 
-  const displayName = user.email?.split("@")[0] ?? "사용자";
+    const displayName =
+    profile?.username ?? user.email?.split("@")[0] ?? "사용자";
 
   return (
     <main className="min-h-screen bg-gray-100">
@@ -77,12 +86,29 @@ export default async function MyPage() {
               </div>
 
               <div>
-                <h2 className="text-2xl font-bold">{displayName}</h2>
-                <p className="mt-1 text-gray-500">{user.email}</p>
-                <p className="mt-1 text-sm text-gray-400">
-                  가입일: {joinedDate}
-                </p>
-              </div>
+  <h2 className="text-2xl font-bold">{displayName}</h2>
+
+  <p className="mt-1 text-gray-500">
+    {profile?.email ?? user.email}
+  </p>
+
+  {profile?.bio && (
+    <p className="mt-3 whitespace-pre-line text-gray-700">
+      {profile.bio}
+    </p>
+  )}
+
+  <p className="mt-2 text-sm text-gray-400">
+    가입일: {joinedDate}
+  </p>
+
+  <Link
+    href="/profile/edit"
+    className="mt-4 inline-block rounded-lg bg-gray-900 px-4 py-2 text-sm font-bold text-white hover:bg-black"
+  >
+    프로필 수정
+  </Link>
+</div>
             </div>
 
             <div className="mt-8 grid grid-cols-5 gap-4">
