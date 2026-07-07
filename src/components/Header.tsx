@@ -4,6 +4,11 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createSupabaseClient } from "@/lib/supabase/client";
 
+type Profile = {
+  username: string | null;
+  avatar_url: string | null;
+};
+
 export default function Header() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -11,6 +16,7 @@ export default function Header() {
   const [keyword, setKeyword] = useState(searchParams.get("q") ?? "");
   const [sort, setSort] = useState(searchParams.get("sort") ?? "latest");
   const [email, setEmail] = useState<string | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
 
   useEffect(() => {
     const supabase = createSupabaseClient();
@@ -21,10 +27,23 @@ export default function Header() {
       } = await supabase.auth.getUser();
 
       setEmail(user?.email ?? null);
+
+      if (user) {
+        const { data: profileData } = await supabase
+          .from("profiles")
+          .select("username, avatar_url")
+          .eq("id", user.id)
+          .maybeSingle();
+
+        setProfile(profileData);
+      }
     }
 
     getUser();
   }, []);
+
+  const displayName =
+    profile?.username ?? email?.split("@")[0] ?? "사용자";
 
   function moveToSearch(nextKeyword: string, nextSort: string) {
     const trimmed = nextKeyword.trim();
@@ -94,12 +113,26 @@ export default function Header() {
             + 업로드
           </button>
 
-          <span
-  onClick={() => router.push("/mypage")}
-  className="cursor-pointer text-sm text-gray-600 hover:underline"
->
-  {email}
-</span>
+          <button
+            onClick={() => router.push("/mypage")}
+            className="flex items-center gap-2 rounded-full px-2 py-1 hover:bg-gray-100"
+          >
+            {profile?.avatar_url ? (
+              <img
+                src={profile.avatar_url}
+                alt="내 프로필 사진"
+                className="h-9 w-9 rounded-full object-cover"
+              />
+            ) : (
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-red-100 text-sm font-bold text-red-600">
+                {displayName.slice(0, 1).toUpperCase()}
+              </div>
+            )}
+
+            <span className="max-w-[120px] truncate text-sm font-bold text-gray-700">
+              {displayName}
+            </span>
+          </button>
 
           <button
             onClick={handleLogout}

@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import Header from "@/components/Header";
+import AvatarUpload from "@/components/AvatarUpload";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -44,7 +45,7 @@ export default async function EditProfilePage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("username, email, bio, avatar_url")
+    .select("username, bio, avatar_url")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -52,57 +53,41 @@ export default async function EditProfilePage() {
     <main className="min-h-screen bg-gray-100">
       <Header />
 
-      <div className="mx-auto max-w-2xl p-8">
-        <h1 className="mb-8 text-3xl font-bold">프로필 수정</h1>
+      <div className="p-8">
+        <div className="mx-auto max-w-2xl rounded-2xl bg-white p-8 shadow">
+          <h1 className="mb-6 text-3xl font-bold">프로필 수정</h1>
 
-        <form action={updateProfile} className="rounded-2xl bg-white p-8 shadow">
-          <div className="mb-6">
-            <label className="mb-2 block font-bold">이메일</label>
-            <input
-              value={profile?.email ?? user.email ?? ""}
-              disabled
-              className="w-full rounded-lg border bg-gray-100 p-3 text-gray-500"
-            />
-          </div>
+          <AvatarUpload userId={user.id} avatarUrl={profile?.avatar_url} />
 
-          <div className="mb-6">
-            <label className="mb-2 block font-bold">채널명</label>
-            <input
-              name="username"
-              defaultValue={profile?.username ?? ""}
-              placeholder="채널명을 입력하세요"
-              className="w-full rounded-lg border p-3"
-              required
-            />
-          </div>
+          <form action={updateProfile} className="mt-8 space-y-5">
+            <div>
+              <label className="mb-2 block font-bold">이름</label>
+              <input
+                name="username"
+                defaultValue={profile?.username ?? ""}
+                className="w-full rounded-lg border px-4 py-3"
+                placeholder="이름을 입력하세요"
+              />
+            </div>
 
-          <div className="mb-8">
-            <label className="mb-2 block font-bold">소개글</label>
-            <textarea
-              name="bio"
-              defaultValue={profile?.bio ?? ""}
-              placeholder="채널 소개글을 입력하세요"
-              rows={5}
-              className="w-full rounded-lg border p-3"
-            />
-          </div>
+            <div>
+              <label className="mb-2 block font-bold">소개</label>
+              <textarea
+                name="bio"
+                defaultValue={profile?.bio ?? ""}
+                className="h-32 w-full rounded-lg border px-4 py-3"
+                placeholder="소개를 입력하세요"
+              />
+            </div>
 
-          <div className="flex gap-3">
             <button
               type="submit"
-              className="rounded-lg bg-red-600 px-6 py-3 font-bold text-white hover:bg-red-700"
+              className="w-full rounded-lg bg-black py-3 font-bold text-white hover:bg-gray-800"
             >
               저장하기
             </button>
-
-            <a
-              href="/mypage"
-              className="rounded-lg bg-gray-200 px-6 py-3 font-bold hover:bg-gray-300"
-            >
-              취소
-            </a>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </main>
   );

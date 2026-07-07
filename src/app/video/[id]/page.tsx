@@ -1,3 +1,4 @@
+import Link from "next/link";
 import EditVideoButton from "@/components/EditVideoButton";
 import DeleteVideoButton from "@/components/DeleteVideoButton";
 import LikeButton from "@/components/LikeButton";
@@ -48,6 +49,28 @@ export default async function VideoPage({ params }: Props) {
     .eq("video_id", video.id)
     .order("created_at", { ascending: false });
 
+  const commentUserIds = comments?.map((comment) => comment.user_id) ?? [];
+
+  const { data: commentProfiles } =
+    commentUserIds.length > 0
+      ? await supabase
+          .from("profiles")
+          .select("id, username, avatar_url")
+          .in("id", commentUserIds)
+      : { data: [] };
+
+  const commentsWithProfiles =
+    comments?.map((comment) => {
+      const profile = commentProfiles?.find(
+        (profile) => profile.id === comment.user_id,
+      );
+
+      return {
+        ...comment,
+        profile,
+      };
+    }) ?? [];
+
   const { data: subscription } = await supabase
     .from("subscriptions")
     .select("id")
@@ -75,7 +98,13 @@ export default async function VideoPage({ params }: Props) {
         <h1 className="mt-6 text-3xl font-bold">{video.title}</h1>
 
         <div className="mt-2 text-gray-500">
-          {video.creator} · 조회수 {updatedViews.toLocaleString()}회
+          <Link
+            href={`/channel/${video.user_id}`}
+            className="font-semibold hover:text-black hover:underline"
+          >
+            {video.creator}
+          </Link>
+          <span> · 조회수 {updatedViews.toLocaleString()}회</span>
         </div>
 
         <div className="mt-3">
@@ -121,7 +150,7 @@ export default async function VideoPage({ params }: Props) {
 
       <CommentSection
         videoId={video.id}
-        comments={comments ?? []}
+        comments={commentsWithProfiles}
         currentUserId={user?.id}
       />
     </main>

@@ -52,7 +52,7 @@ export default async function MyPage() {
     subscribedUserIds.length > 0
       ? await supabase
           .from("profiles")
-          .select("id, username, email")
+          .select("id, username, email, avatar_url")
           .in("id", subscribedUserIds)
       : { data: [] };
 
@@ -80,13 +80,21 @@ export default async function MyPage() {
           <h1 className="mb-6 text-3xl font-bold">마이페이지</h1>
 
           <section className="mb-8 rounded-2xl bg-white p-8 shadow">
-            <div className="flex items-center gap-6">
-              <div className="flex h-24 w-24 items-center justify-center rounded-full bg-red-100 text-4xl font-bold text-red-600">
-                {displayName.slice(0, 1).toUpperCase()}
-              </div>
+          <div className="flex items-center gap-6">
+  {profile?.avatar_url ? (
+    <img
+      src={profile.avatar_url}
+      alt="프로필 사진"
+      className="h-24 w-24 rounded-full object-cover"
+    />
+  ) : (
+    <div className="flex h-24 w-24 items-center justify-center rounded-full bg-red-100 text-4xl font-bold text-red-600">
+      {displayName.slice(0, 1).toUpperCase()}
+    </div>
+  )}
 
-              <div>
-  <h2 className="text-2xl font-bold">{displayName}</h2>
+  <div>
+    <h2 className="text-2xl font-bold">{displayName}</h2>
 
   <p className="mt-1 text-gray-500">
     {profile?.email ?? user.email}
@@ -162,11 +170,28 @@ export default async function MyPage() {
     href={`/channel/${channel.id}`}
     className="block rounded-xl bg-gray-100 p-5 transition hover:bg-gray-200"
   >
-    <div className="font-bold">
-      {channel.username ?? "이름 없는 채널"}
+    <div className="mb-3 flex items-center gap-3">
+      {channel.avatar_url ? (
+        <img
+          src={channel.avatar_url}
+          alt="채널 프로필 사진"
+          className="h-10 w-10 rounded-full object-cover"
+        />
+      ) : (
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 text-lg font-bold text-red-600">
+          {(channel.username ?? "채널").slice(0, 1).toUpperCase()}
+        </div>
+      )}
+
+      <div>
+        <div className="font-bold">
+          {channel.username ?? "이름 없는 채널"}
+        </div>
+        <div className="text-sm text-gray-500">{channel.email}</div>
+      </div>
     </div>
-    <div className="mt-1 text-sm text-gray-500">{channel.email}</div>
-    <div className="mt-1 text-sm text-gray-500">구독중</div>
+
+    <div className="text-sm text-gray-500">구독중</div>
   </Link>
 ))}
               </div>
