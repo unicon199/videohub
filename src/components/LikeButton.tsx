@@ -4,7 +4,7 @@ import { useState } from "react";
 import { createSupabaseClient } from "@/lib/supabase/client";
 
 type LikeButtonProps = {
-  id: number;
+  id: string;
   likes: number;
 };
 
@@ -39,9 +39,10 @@ export default function LikeButton({ id, likes }: LikeButtonProps) {
     <button
       onClick={handleLike}
       disabled={isLoading}
-      className="mt-4 rounded-full bg-white px-5 py-2 font-bold shadow hover:bg-gray-100 disabled:opacity-60"
+      className="flex items-center gap-2 rounded-full bg-gray-100 px-5 py-2.5 text-sm font-bold text-gray-900 transition hover:bg-gray-200 disabled:opacity-60"
     >
-      ❤️ 좋아요 {likeCount.toLocaleString()}개
+      <span>❤️</span>
+      <span>좋아요 {likeCount.toLocaleString()}</span>
     </button>
   );
 }

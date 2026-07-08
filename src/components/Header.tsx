@@ -42,15 +42,17 @@ export default function Header() {
     getUser();
   }, []);
 
-  const displayName =
-    profile?.username ?? email?.split("@")[0] ?? "사용자";
+  const displayName = profile?.username ?? email?.split("@")[0] ?? "사용자";
 
   function moveToSearch(nextKeyword: string, nextSort: string) {
     const trimmed = nextKeyword.trim();
+    const currentCategory = searchParams.get("category");
+
     const params = new URLSearchParams();
 
     if (trimmed) params.set("q", trimmed);
     if (nextSort !== "latest") params.set("sort", nextSort);
+    if (currentCategory) params.set("category", currentCategory);
 
     const queryString = params.toString();
     router.push(queryString ? `/?${queryString}` : "/");

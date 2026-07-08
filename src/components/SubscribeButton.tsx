@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createSupabaseClient } from "@/lib/supabase/client";
 
 type Props = {
@@ -17,6 +18,7 @@ export default function SubscribeButton({
   initialCount,
 }: Props) {
   const supabase = createSupabaseClient();
+  const router = useRouter();
 
   const [subscribed, setSubscribed] = useState(initialSubscribed);
   const [count, setCount] = useState(initialCount);
@@ -25,6 +27,7 @@ export default function SubscribeButton({
   const handleSubscribe = async () => {
     if (!currentUserId) {
       alert("로그인이 필요합니다.");
+      router.push("/login");
       return;
     }
 
@@ -61,18 +64,18 @@ export default function SubscribeButton({
   if (currentUserId === targetUserId) {
     return null;
   }
-  
+
   return (
     <button
       onClick={handleSubscribe}
       disabled={loading}
-      className={`rounded-full px-4 py-2 text-sm font-semibold ${
+      className={`rounded-full px-5 py-2.5 text-sm font-bold transition disabled:opacity-60 ${
         subscribed
-          ? "bg-gray-200 text-gray-800"
-          : "bg-black text-white"
+          ? "bg-gray-100 text-gray-900 hover:bg-gray-200"
+          : "bg-black text-white hover:bg-gray-800"
       }`}
     >
-      {subscribed ? "구독중" : "구독"} {count}
+      {subscribed ? "구독중" : "구독"}
     </button>
   );
 }

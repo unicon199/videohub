@@ -23,136 +23,134 @@ export default async function VideoPage({ params }: Props) {
 
   const supabase = await createSupabaseServerClient();
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   const { data: video } = await supabase
     .from("videos")
-    .select(
-      "id, title, description, video_url, creator, category, ai_tool, duration, views, likes, created_at, user_id",
-    )
+    .select("*")
     .eq("id", id)
     .maybeSingle();
 
   if (!video) {
     return (
-      <div className="p-10">
+      <main className="mx-auto max-w-5xl px-4 py-10">
         <h1 className="text-2xl font-bold">영상을 찾을 수 없습니다.</h1>
-      </div>
+      </main>
     );
   }
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("username, avatar_url")
+    .eq("id", video.user_id)
+    .maybeSingle();
+
+  await supabase
+    .from("videos")
+    .update({
+      views: (video.views ?? 0) + 1,
+    })
+    .eq("id", id);
+
+  if (user) {
+    await supabase.from("watch_history").upsert(
+      {
+        user_id: user.id,
+        video_id: video.id,
+        watched_at: new Date().toISOString(),
+      },
+      {
+        onConflict: "user_id,video_id",
+      }
+    );
+  }
 
   const { data: comments } = await supabase
     .from("comments")
-    .select("id, video_id, user_id, user_email, content, created_at")
-    .eq("video_id", video.id)
+    .select(
+      `
+      *,
+      profiles (
+        username,
+        avatar_url
+      )
+    `
+    )
+    .eq("video_id", id)
     .order("created_at", { ascending: false });
 
-  const commentUserIds = comments?.map((comment) => comment.user_id) ?? [];
-
-  const { data: commentProfiles } =
-    commentUserIds.length > 0
-      ? await supabase
-          .from("profiles")
-          .select("id, username, avatar_url")
-          .in("id", commentUserIds)
-      : { data: [] };
-
-  const commentsWithProfiles =
-    comments?.map((comment) => {
-      const profile = commentProfiles?.find(
-        (profile) => profile.id === comment.user_id,
-      );
-
-      return {
-        ...comment,
-        profile,
-      };
-    }) ?? [];
-
-  const { data: subscription } = await supabase
-    .from("subscriptions")
-    .select("id")
-    .eq("subscriber_id", user?.id ?? "")
-    .eq("subscribed_to_id", video.user_id)
-    .maybeSingle();
-
-  const { count: subscriberCount } = await supabase
-    .from("subscriptions")
-    .select("*", { count: "exact", head: true })
-    .eq("subscribed_to_id", video.user_id);
-
   const isOwner = user?.id === video.user_id;
-  const updatedViews = (video.views ?? 0) + 1;
-
-  await supabase.from("videos").update({ views: updatedViews }).eq("id", id);
+  const channelName = profile?.username ?? video.creator ?? "알 수 없는 채널";
+  const avatarUrl = profile?.avatar_url;
 
   return (
-    <main className="min-h-screen bg-gray-100 p-8">
-      <div className="mx-auto max-w-5xl">
-        <video controls className="aspect-video w-full rounded-xl bg-black">
-          <source src={video.video_url} type="video/mp4" />
-        </video>
+    <main className="mx-auto max-w-6xl px-4 py-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
+        <section>
+          <div className="overflow-hidden rounded-xl bg-black">
+            <video
+              src={video.video_url}
+              controls
+              className="aspect-video w-full"
+            />
+          </div>
 
-        <h1 className="mt-6 text-3xl font-bold">{video.title}</h1>
+          <h1 className="mt-4 text-2xl font-bold">{video.title}</h1>
 
-        <div className="mt-2 text-gray-500">
-          <Link
-            href={`/channel/${video.user_id}`}
-            className="font-semibold hover:text-black hover:underline"
-          >
-            {video.creator}
-          </Link>
-          <span> · 조회수 {updatedViews.toLocaleString()}회</span>
-        </div>
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-4">
+            <Link
+              href={`/channel/${video.user_id}`}
+              className="flex items-center gap-3"
+            >
+              <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-gray-200">
+                {avatarUrl ? (
+                  <img
+                    src={avatarUrl}
+                    alt={channelName}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <span className="text-sm font-bold text-gray-600">
+                    {channelName[0]}
+                  </span>
+                )}
+              </div>
 
-        <div className="mt-3">
-          <SubscribeButton
-            targetUserId={video.user_id}
+              <div>
+                <p className="font-semibold">{channelName}</p>
+                <p className="text-sm text-gray-500">채널 보기</p>
+              </div>
+            </Link>
+
+            <div className="flex items-center gap-2">
+              <SubscribeButton channelUserId={video.user_id} />
+              <LikeButton id={video.id} likes={video.likes ?? 0} />
+              {isOwner && <EditVideoButton id={video.id} />}
+              {isOwner && <DeleteVideoButton id={video.id} />}
+            </div>
+          </div>
+
+          <div className="mt-4 rounded-xl bg-gray-100 p-4">
+            <p className="text-sm font-semibold">
+              조회수 {(video.views ?? 0) + 1}회 · {formatDate(video.created_at)}
+            </p>
+
+            {video.description && (
+              <p className="mt-3 whitespace-pre-wrap text-sm">
+                {video.description}
+              </p>
+            )}
+          </div>
+
+          <CommentSection
+            videoId={video.id}
+            comments={comments ?? []}
             currentUserId={user?.id}
-            initialSubscribed={!!subscription}
-            initialCount={subscriberCount ?? 0}
           />
-        </div>
-
-        <div className="mt-4 flex gap-3">
-          <LikeButton id={video.id} likes={video.likes ?? 0} />
-
-          {isOwner && (
-            <>
-              <EditVideoButton id={video.id} />
-              <DeleteVideoButton id={video.id} />
-            </>
-          )}
-        </div>
-
-        <div className="mt-4 rounded-lg bg-white p-5 shadow">
-          <p>{video.description}</p>
-
-          <div className="mt-4 text-sm text-gray-500">
-            AI Tool : {video.ai_tool}
-          </div>
-
-          <div className="text-sm text-gray-500">
-            카테고리 : {video.category}
-          </div>
-
-          <div className="text-sm text-gray-500">
-            업로드 : {formatDate(video.created_at)}
-          </div>
-
-          <div className="text-sm text-gray-500">
-            길이 : {video.duration}
-          </div>
-        </div>
+        </section>
       </div>
-
-      <CommentSection
-        videoId={video.id}
-        comments={commentsWithProfiles}
-        currentUserId={user?.id}
-      />
     </main>
   );
 }

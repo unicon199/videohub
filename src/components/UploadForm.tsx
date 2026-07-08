@@ -6,11 +6,13 @@ import { createSupabaseClient } from "@/lib/supabase/client";
 import { captureVideoThumbnail, getVideoDuration } from "@/lib/video";
 
 const CATEGORIES = [
-  "AI 드라마",
-  "AI 숏폼",
-  "AI 뮤직비디오",
-  "AI 공포",
-  "AI 애니메이션",
+  "AI",
+  "게임",
+  "음악",
+  "브이로그",
+  "교육",
+  "쇼츠",
+  "기타",
 ] as const;
 
 const AI_TOOLS = ["Runway", "Kling", "Pika", "Veo", "Sora", "기타"] as const;

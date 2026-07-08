@@ -19,7 +19,6 @@ export default function VideoCard({
 }: VideoCardProps) {
   return (
     <div className="overflow-hidden rounded-xl bg-white shadow transition hover:scale-[1.02] hover:shadow-xl">
-
       <Link href={`/video/${id}`}>
         <div className="aspect-video bg-gray-300">
           {thumbnailUrl && (
@@ -34,9 +33,7 @@ export default function VideoCard({
 
       <div className="p-4">
         <Link href={`/video/${id}`}>
-          <h2 className="font-bold hover:underline">
-            {title}
-          </h2>
+          <h2 className="font-bold hover:underline">{title}</h2>
         </Link>
 
         <Link

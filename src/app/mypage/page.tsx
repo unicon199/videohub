@@ -27,7 +27,7 @@ export default async function MyPage() {
     .from("profiles")
     .select("username, email, avatar_url, bio, created_at")
     .eq("id", user.id)
-    .maybeSingle();  
+    .maybeSingle();
 
   const { count: followingCount } = await supabase
     .from("subscriptions")
@@ -39,15 +39,15 @@ export default async function MyPage() {
     .select("*", { count: "exact", head: true })
     .eq("subscribed_to_id", user.id);
 
-    const { data: followingList } = await supabase
+  const { data: followingList } = await supabase
     .from("subscriptions")
     .select("subscribed_to_id, created_at")
     .eq("subscriber_id", user.id)
     .order("created_at", { ascending: false });
-  
+
   const subscribedUserIds =
     followingList?.map((item) => item.subscribed_to_id) ?? [];
-  
+
   const { data: subscribedChannels } =
     subscribedUserIds.length > 0
       ? await supabase
@@ -62,13 +62,13 @@ export default async function MyPage() {
   const totalLikes =
     videos?.reduce((sum, video) => sum + (video.likes ?? 0), 0) ?? 0;
 
-    const joinedDate = profile?.created_at
+  const joinedDate = profile?.created_at
     ? new Date(profile.created_at).toLocaleDateString("ko-KR")
     : user.created_at
       ? new Date(user.created_at).toLocaleDateString("ko-KR")
       : "-";
 
-    const displayName =
+  const displayName =
     profile?.username ?? user.email?.split("@")[0] ?? "사용자";
 
   return (
@@ -80,43 +80,45 @@ export default async function MyPage() {
           <h1 className="mb-6 text-3xl font-bold">마이페이지</h1>
 
           <section className="mb-8 rounded-2xl bg-white p-8 shadow">
-          <div className="flex items-center gap-6">
-  {profile?.avatar_url ? (
-    <img
-      src={profile.avatar_url}
-      alt="프로필 사진"
-      className="h-24 w-24 rounded-full object-cover"
-    />
-  ) : (
-    <div className="flex h-24 w-24 items-center justify-center rounded-full bg-red-100 text-4xl font-bold text-red-600">
-      {displayName.slice(0, 1).toUpperCase()}
-    </div>
-  )}
+            <div className="flex items-center gap-6">
+              {profile?.avatar_url ? (
+                <img
+                  src={profile.avatar_url}
+                  alt="프로필 사진"
+                  className="h-24 w-24 rounded-full object-cover"
+                />
+              ) : (
+                <div className="flex h-24 w-24 items-center justify-center rounded-full bg-red-100 text-4xl font-bold text-red-600">
+                  {displayName.slice(0, 1).toUpperCase()}
+                </div>
+              )}
 
-  <div>
-    <h2 className="text-2xl font-bold">{displayName}</h2>
+              <div>
+                <h2 className="text-2xl font-bold">{displayName}</h2>
 
-  <p className="mt-1 text-gray-500">
-    {profile?.email ?? user.email}
-  </p>
+                <p className="mt-1 text-gray-500">
+                  {profile?.email ?? user.email}
+                </p>
 
-  {profile?.bio && (
-    <p className="mt-3 whitespace-pre-line text-gray-700">
-      {profile.bio}
-    </p>
-  )}
+                {profile?.bio && (
+                  <p className="mt-3 whitespace-pre-line text-gray-700">
+                    {profile.bio}
+                  </p>
+                )}
 
-  <p className="mt-2 text-sm text-gray-400">
-    가입일: {joinedDate}
-  </p>
+                <p className="mt-2 text-sm text-gray-400">
+                  가입일: {joinedDate}
+                </p>
 
-  <Link
-    href="/profile/edit"
-    className="mt-4 inline-block rounded-lg bg-gray-900 px-4 py-2 text-sm font-bold text-white hover:bg-black"
-  >
-    프로필 수정
-  </Link>
-</div>
+                <div className="mt-4 flex gap-2">
+                  <Link
+                    href="/profile/edit"
+                    className="inline-block rounded-lg bg-gray-900 px-4 py-2 text-sm font-bold text-white hover:bg-black"
+                  >
+                    프로필 수정
+                  </Link>
+                </div>
+              </div>
             </div>
 
             <div className="mt-8 grid grid-cols-5 gap-4">
@@ -165,35 +167,39 @@ export default async function MyPage() {
             ) : (
               <div className="grid grid-cols-4 gap-4">
                 {subscribedChannels.map((channel) => (
-  <Link
-    key={channel.id}
-    href={`/channel/${channel.id}`}
-    className="block rounded-xl bg-gray-100 p-5 transition hover:bg-gray-200"
-  >
-    <div className="mb-3 flex items-center gap-3">
-      {channel.avatar_url ? (
-        <img
-          src={channel.avatar_url}
-          alt="채널 프로필 사진"
-          className="h-10 w-10 rounded-full object-cover"
-        />
-      ) : (
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 text-lg font-bold text-red-600">
-          {(channel.username ?? "채널").slice(0, 1).toUpperCase()}
-        </div>
-      )}
+                  <Link
+                    key={channel.id}
+                    href={`/channel/${channel.id}`}
+                    className="block rounded-xl bg-gray-100 p-5 transition hover:bg-gray-200"
+                  >
+                    <div className="mb-3 flex items-center gap-3">
+                      {channel.avatar_url ? (
+                        <img
+                          src={channel.avatar_url}
+                          alt="채널 프로필 사진"
+                          className="h-10 w-10 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 text-lg font-bold text-red-600">
+                          {(channel.username ?? "채널")
+                            .slice(0, 1)
+                            .toUpperCase()}
+                        </div>
+                      )}
 
-      <div>
-        <div className="font-bold">
-          {channel.username ?? "이름 없는 채널"}
-        </div>
-        <div className="text-sm text-gray-500">{channel.email}</div>
-      </div>
-    </div>
+                      <div>
+                        <div className="font-bold">
+                          {channel.username ?? "이름 없는 채널"}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {channel.email}
+                        </div>
+                      </div>
+                    </div>
 
-    <div className="text-sm text-gray-500">구독중</div>
-  </Link>
-))}
+                    <div className="text-sm text-gray-500">구독중</div>
+                  </Link>
+                ))}
               </div>
             )}
           </section>
