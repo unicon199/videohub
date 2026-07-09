@@ -75,13 +75,22 @@ export default function Header() {
   }
 
   return (
-    <header className="flex items-center justify-between bg-white px-6 py-4 shadow">
-      <h1
-        onClick={() => router.push("/")}
-        className="cursor-pointer text-2xl font-bold text-red-600"
-      >
-        VideoHub
-      </h1>
+    <header className="flex items-center justify-between bg-white px-5 py-4 shadow">
+      <div className="flex items-center gap-4">
+        <button
+          type="button"
+          className="rounded-full px-3 py-2 text-xl hover:bg-gray-100"
+        >
+          ☰
+        </button>
+
+        <h1
+          onClick={() => router.push("/")}
+          className="cursor-pointer text-2xl font-bold text-red-600"
+        >
+          VideoHub
+        </h1>
+      </div>
 
       <div className="flex items-center gap-3">
         <input
@@ -108,33 +117,6 @@ export default function Header() {
 
       {email ? (
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => router.push("/subscriptions")}
-            className="rounded bg-gray-100 px-5 py-3 font-bold text-gray-800 hover:bg-gray-200"
-          >
-            구독
-          </button>
-
-          <button
-            onClick={() => router.push("/history")}
-            className="rounded bg-gray-100 px-5 py-3 font-bold text-gray-800 hover:bg-gray-200"
-          >
-            시청기록
-          </button>
-
-          <button
-           onClick={() => router.push("/watch-later")}
-           className="rounded bg-gray-100 px-5 py-3 font-bold text-gray-800 hover:bg-gray-200"
-          >
-           나중에 보기
-          </button>
-        <button 
-          onClick={() => router.push("/liked")}
-          className="rounded bg-gray-100 px-5 py-3 font-bold text-gray-800 hover:bg-gray-200"
-          >
-           좋아요
-          </button>     
-          
           <button
             onClick={() => router.push("/upload")}
             className="rounded bg-red-600 px-5 py-3 font-bold text-white"
