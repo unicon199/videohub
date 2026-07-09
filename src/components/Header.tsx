@@ -109,6 +109,13 @@ export default function Header() {
       {email ? (
         <div className="flex items-center gap-3">
           <button
+            onClick={() => router.push("/subscriptions")}
+            className="rounded bg-gray-100 px-5 py-3 font-bold text-gray-800 hover:bg-gray-200"
+          >
+            구독
+          </button>
+
+          <button
             onClick={() => router.push("/history")}
             className="rounded bg-gray-100 px-5 py-3 font-bold text-gray-800 hover:bg-gray-200"
           >
