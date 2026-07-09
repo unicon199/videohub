@@ -4,6 +4,7 @@ import DeleteVideoButton from "@/components/DeleteVideoButton";
 import LikeButton from "@/components/LikeButton";
 import CommentSection from "@/components/CommentSection";
 import SubscribeButton from "@/components/SubscribeButton";
+import WatchLaterButton from "@/components/WatchLaterButton";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -125,11 +126,15 @@ export default async function VideoPage({ params }: Props) {
             </Link>
 
             <div className="flex items-center gap-2">
-              <SubscribeButton channelUserId={video.user_id} />
-              <LikeButton id={video.id} likes={video.likes ?? 0} />
-              {isOwner && <EditVideoButton id={video.id} />}
-              {isOwner && <DeleteVideoButton id={video.id} />}
-            </div>
+  <SubscribeButton channelUserId={video.user_id} />
+
+  <WatchLaterButton videoId={video.id} />
+
+  <LikeButton id={video.id} likes={video.likes ?? 0} />
+
+  {isOwner && <EditVideoButton id={video.id} />}
+  {isOwner && <DeleteVideoButton id={video.id} />}
+</div>
           </div>
 
           <div className="mt-4 rounded-xl bg-gray-100 p-4">

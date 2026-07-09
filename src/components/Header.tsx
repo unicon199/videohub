@@ -123,6 +123,13 @@ export default function Header() {
           </button>
 
           <button
+           onClick={() => router.push("/watch-later")}
+           className="rounded bg-gray-100 px-5 py-3 font-bold text-gray-800 hover:bg-gray-200"
+          >
+           나중에 보기
+          </button>
+
+          <button
             onClick={() => router.push("/upload")}
             className="rounded bg-red-600 px-5 py-3 font-bold text-white"
           >
