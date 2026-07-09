@@ -2,7 +2,11 @@
 
 import { useRouter } from "next/navigation";
 
-export default function Sidebar() {
+type SidebarProps = {
+  isOpen: boolean;
+};
+
+export default function Sidebar({ isOpen }: SidebarProps) {
   const router = useRouter();
 
   const menuItems = [
@@ -14,7 +18,11 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="fixed left-0 top-[73px] h-[calc(100vh-73px)] w-60 border-r bg-white px-3 py-4">
+    <aside
+      className={`fixed left-0 top-[73px] h-[calc(100vh-73px)] w-60 border-r bg-white px-3 py-4 transition-transform duration-300 ${
+        isOpen ? "translate-x-0" : "-translate-x-full"
+      }`}
+    >
       <nav className="space-y-1">
         {menuItems.map((item) => (
           <button

@@ -9,7 +9,11 @@ type Profile = {
   avatar_url: string | null;
 };
 
-export default function Header() {
+type HeaderProps = {
+  onMenuClick?: () => void;
+};
+
+export default function Header({ onMenuClick }: HeaderProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -79,6 +83,7 @@ export default function Header() {
       <div className="flex items-center gap-4">
         <button
           type="button"
+          onClick={onMenuClick}
           className="rounded-full px-3 py-2 text-xl hover:bg-gray-100"
         >
           ☰

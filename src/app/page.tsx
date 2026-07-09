@@ -1,6 +1,5 @@
 import Link from "next/link";
-import Header from "@/components/Header";
-import Sidebar from "@/components/Sidebar";
+import HomeLayout from "@/components/HomeLayout";
 import VideoCard from "@/components/VideoCard";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -55,11 +54,7 @@ export default async function Home({ searchParams }: Props) {
 
   return (
     <main className="min-h-screen bg-gray-100">
-      <Header />
-
-      <Sidebar />
-
-      <div className="ml-60">
+     <HomeLayout>
         <div className="px-8 pt-6">
           <div className="flex gap-2 overflow-x-auto pb-2">
             {categories.map((item) => {
@@ -130,7 +125,7 @@ export default async function Home({ searchParams }: Props) {
             ))}
           </section>
         )}
-      </div>
-    </main>
+    </HomeLayout>
+  </main>
   );
 }
