@@ -18,12 +18,12 @@ export default function HomeLayout({ children }: HomeLayoutProps) {
       <Sidebar isOpen={isSidebarOpen} />
 
       <div
-  className={`transition-all duration-300 ${
-    isSidebarOpen ? "ml-60" : "ml-0"
-  }`}
->
-  {children}
-</div>
+        className={`transition-all duration-300 ${
+          isSidebarOpen ? "ml-60" : "ml-20"
+        }`}
+      >
+        {children}
+      </div>
     </>
   );
 }

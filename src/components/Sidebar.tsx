@@ -19,8 +19,8 @@ export default function Sidebar({ isOpen }: SidebarProps) {
 
   return (
     <aside
-      className={`fixed left-0 top-[73px] h-[calc(100vh-73px)] w-60 border-r bg-white px-3 py-4 transition-transform duration-300 ${
-        isOpen ? "translate-x-0" : "-translate-x-full"
+      className={`fixed left-0 top-[73px] h-[calc(100vh-73px)] border-r bg-white py-4 transition-all duration-300 ${
+        isOpen ? "w-60 px-3" : "w-20 px-2"
       }`}
     >
       <nav className="space-y-1">
@@ -28,10 +28,15 @@ export default function Sidebar({ isOpen }: SidebarProps) {
           <button
             key={item.path}
             onClick={() => router.push(item.path)}
-            className="flex w-full items-center gap-4 rounded-xl px-4 py-3 text-left text-sm font-semibold text-gray-800 hover:bg-gray-100"
+            className={`flex w-full items-center rounded-xl py-3 text-sm font-semibold text-gray-800 hover:bg-gray-100 ${
+              isOpen
+                ? "justify-start gap-4 px-4"
+                : "justify-center px-0"
+            }`}
           >
-            <span className="text-xl">{item.icon}</span>
-            <span>{item.label}</span>
+            <span className="text-2xl">{item.icon}</span>
+
+            {isOpen && <span>{item.label}</span>}
           </button>
         ))}
       </nav>
@@ -40,18 +45,26 @@ export default function Sidebar({ isOpen }: SidebarProps) {
 
       <button
         onClick={() => router.push("/mypage")}
-        className="flex w-full items-center gap-4 rounded-xl px-4 py-3 text-left text-sm font-semibold text-gray-800 hover:bg-gray-100"
+        className={`flex w-full items-center rounded-xl py-3 text-sm font-semibold text-gray-800 hover:bg-gray-100 ${
+          isOpen
+            ? "justify-start gap-4 px-4"
+            : "justify-center px-0"
+        }`}
       >
-        <span className="text-xl">👤</span>
-        <span>마이페이지</span>
+        <span className="text-2xl">👤</span>
+        {isOpen && <span>마이페이지</span>}
       </button>
 
       <button
         onClick={() => router.push("/upload")}
-        className="flex w-full items-center gap-4 rounded-xl px-4 py-3 text-left text-sm font-semibold text-gray-800 hover:bg-gray-100"
+        className={`flex w-full items-center rounded-xl py-3 text-sm font-semibold text-gray-800 hover:bg-gray-100 ${
+          isOpen
+            ? "justify-start gap-4 px-4"
+            : "justify-center px-0"
+        }`}
       >
-        <span className="text-xl">📤</span>
-        <span>업로드</span>
+        <span className="text-2xl">📤</span>
+        {isOpen && <span>업로드</span>}
       </button>
     </aside>
   );

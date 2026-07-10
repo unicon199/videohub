@@ -106,13 +106,13 @@ export default function Header({ onMenuClick }: HeaderProps) {
           onKeyDown={(e) => {
             if (e.key === "Enter") handleSearch();
           }}
-          className="w-[420px] rounded-full border border-black px-6 py-2 outline-none"
+          className="w-[420px] rounded-full border border-gray-200 px-6 py-2 outline-none"
         />
 
         <select
           value={sort}
           onChange={(e) => handleSort(e.target.value)}
-          className="rounded-full border border-black px-4 py-2"
+          className="rounded-full border-gray-200 px-4 py-2"
         >
           <option value="latest">최신순</option>
           <option value="views">조회수순</option>
